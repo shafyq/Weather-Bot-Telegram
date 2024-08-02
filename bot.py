@@ -14,22 +14,22 @@ logger = logging.getLogger(__name__)
 # Define a few command handlers
 def start(update: Update, context: CallbackContext) -> None:
     user = update.message.from_user
-    context.user_data['referral_code'] = 'YOUR_REFERRAL_CODE'  # Change this to your referral code logic
-    update.message.reply_text('Hi! Please enter your referral code.')
+    context.user_data['referral_code'] = 'Ho11@Ho11@'  # Change this to your referral code logic
+    update.message.reply_text('Hi! This is private Bot. Please give your secret code')
 
 def check_referral(update: Update, context: CallbackContext) -> None:
     if update.message.text == context.user_data['referral_code']:
-        update.message.reply_text('Referral code accepted! What should I call you?')
+        update.message.reply_text('Secret code accepted! What should I call you?')
         context.user_data['verified'] = True
     else:
-        update.message.reply_text('Invalid referral code. Please try again.')
+        update.message.reply_text('Invalid Secret code. Please try again.')
 
 def set_name(update: Update, context: CallbackContext) -> None:
     if context.user_data.get('verified'):
         context.user_data['name'] = update.message.text
         update.message.reply_text(f'Nice to meet you, {context.user_data["name"]}! Please share your location.')
     else:
-        update.message.reply_text('Please enter a valid referral code first.')
+        update.message.reply_text('Please enter a valid secret code first.')
 
 def set_location(update: Update, context: CallbackContext) -> None:
     if context.user_data.get('verified'):
@@ -37,7 +37,7 @@ def set_location(update: Update, context: CallbackContext) -> None:
         update.message.reply_text('Location set! You will receive daily weather updates at 6 AM.')
         # Adjust timezone and schedule tasks
     else:
-        update.message.reply_text('Please enter a valid referral code first.')
+        update.message.reply_text('Please enter a valid secret code first.')
 
 def good_morning(context: CallbackContext) -> None:
     job = context.job
@@ -47,7 +47,7 @@ def good_morning(context: CallbackContext) -> None:
     context.bot.send_message(job.context, text=f'Good morning, {name}!\n{weather_info}')
 
 def get_weather(location: str) -> str:
-    api_key = 'YOUR_WEATHER_API_KEY'
+    api_key = 'c56366569f234c13919192259242807'
     url = f'http://api.weatherapi.com/v1/forecast.json?key={api_key}&q={location}&hours=24'
     response = requests.get(url)
     weather_data = response.json()
@@ -59,10 +59,10 @@ def shut_down(update: Update, context: CallbackContext) -> None:
         context.user_data['shut_down'] = True
         update.message.reply_text('Bot shut down for you. You will no longer receive messages.')
     else:
-        update.message.reply_text('Please enter a valid referral code first.')
+        update.message.reply_text('Please enter a valid secret code first.')
 
 def main() -> None:
-    updater = Updater("YOUR_TELEGRAM_API_TOKEN")
+    updater = Updater("7419238901:AAFw1seutpi2Pi4KVhm_3G0vrjn7CzN5cCE")
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler("start", start))

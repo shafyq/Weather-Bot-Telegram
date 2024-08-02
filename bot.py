@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import requests
 import pytz
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 
 # Enable logging
 logging.basicConfig(
@@ -54,6 +54,13 @@ def get_weather(location: str) -> str:
     # Format the weather data
     return "Weather data here"  # Replace with actual formatted data
 
+def shut_down(update: Update, context: CallbackContext) -> None:
+    if context.user_data.get('verified'):
+        context.user_data['shut_down'] = True
+        update.message.reply_text('Bot shut down for you. You will no longer receive messages.')
+    else:
+        update.message.reply_text('Please enter a valid referral code first.')
+
 def main() -> None:
     updater = Updater("YOUR_TELEGRAM_API_TOKEN")
     dispatcher = updater.dispatcher
@@ -62,8 +69,14 @@ def main() -> None:
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, check_referral))
     dispatcher.add_handler(MessageHandler(Filters.text & Filters.regex(r'^[A-Za-z]+$'), set_name))
     dispatcher.add_handler(MessageHandler(Filters.text & Filters.regex(r'^[A-Za-z, ]+$'), set_location))
+    dispatcher.add_handler(CommandHandler("shutdown", shut_down))
 
-    updater.job_queue.run_daily(good_morning, time=datetime.time(6, 0, 0))
+    def daily_job(context: CallbackContext):
+        for user_id, user_data in context.dispatcher.user_data.items():
+            if not user_data.get('shut_down', False):
+                context.job_queue.run_once(good_morning, time(6, 0, 0), context=user_id, name=str(user_id))
+
+    updater.job_queue.run_daily(daily_job, time=time(6, 0, 0))
 
     updater.start_polling()
     updater.idle()
